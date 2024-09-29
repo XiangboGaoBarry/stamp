@@ -1,0 +1,245 @@
+/* Custom Styles */
+
+.publication-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .highlighted-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 20px;
+    color: white;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .highlighted-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+  }
+  .highlighted-link .icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+  .github-link {
+    background: linear-gradient(45deg, #4CAF50, #2196F3);
+  }
+  .arxiv-link {
+    background: linear-gradient(45deg, #FFB74D, #FFA726);
+  }
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 12px rgba(33, 150, 243, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  .title-container {
+    text-align: center;
+    padding: 25px 0;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .main-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-right: 10px;
+    background: linear-gradient(45deg, #FF4500, #FFA500, #00CED1, #4169E1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 300% 300%;
+    animation: gradient-shift 5s ease infinite;
+  }
+
+  .subtitle {
+    font-size: 2.8rem;
+    color: #333;
+    font-weight: 400;
+  }
+
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .hero.is-light {
+    background: linear-gradient(135deg, #e0f7fa, #e8f5e9, #fff9c4);
+    padding: 10px 0;
+  }
+
+  .hero .container.is-max-desktop {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .hero .hero-body {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero .video-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+  }
+  
+  .hero .video-container:hover {
+    transform: translateY(-5px);
+  }
+  
+  .hero #video {
+    width: 100%;
+    display: block;
+  }
+
+  .dataset-btn {
+    background-color: #4a4a4a;
+    color: white;
+    transition: all 0.3s ease;
+  }
+  .dataset-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  .dataset-btn.active {
+    background-color: #00d1b2;
+  }
+  .container.is-widescreen {
+    max-width: 1440px !important;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .container.is-middlewidescreen {
+    max-width: 1200px !important;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .video-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  #result-video {
+    width: 100%;
+    height: auto;
+    max-height: 800px;
+    object-fit: contain;
+  }
+  .video-container video {
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+  }
+  .title.is-3 {
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    .title-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    .main-title {
+      font-size: 2rem;
+      margin-right: 0;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      font-size: 2rem;
+    }
+    .hero.is-light {
+      padding: 30px 0;
+    }
+    .hero .video-container {
+      border-radius: 10px;
+    }
+  }
+
+  .column.is-narrow {
+    padding: 0 10px;
+  }
+  .field {
+    text-align: center;
+  }
+  .label {
+    margin-bottom: 5px;
+  }
+
+  .section.is-light {
+    background: linear-gradient(135deg, #e0f7fa, #e8f5e9, #fff9c4);
+    padding: 60px 0;
+  }
+
+  .section.is-light .container {
+    max-width: 1440px !important;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .section.is-light .hero-body {
+    padding: 2rem 1.5rem;
+  }
+
+  .colorful-title {
+    text-align: center;
+    padding: 20px 0;
+    color: #7e56d0;
+    font-size: 2.2rem;
+    font-weight: 1000;
+    margin-bottom: 30px;
+  }
+
+  .sub-sub-title {
+    text-align: center;
+    /* padding: 20px 0; */
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 30px;
+  }
+
+  .colorful-title h2 {
+      margin: 0;
+      padding: 0;
+  }
+
+  @keyframes gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+.dataset-btn.active {
+  background-color: #3273dc;
+  color: #fff;
+}
