@@ -76,7 +76,3 @@ This project builds upon the excellent work of [HEAL](https://github.com/yifanlu
 ## Contributing and Contact
 
 For the purpose of double blind review, we will release the contact information later. 
-
-## Contact
-
-For any questions or concerns, please open an issue in this repository, and we'll be happy to assist you.
