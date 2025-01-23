@@ -169,4 +169,5 @@ class SpVoxelPreprocessor(BasePreprocessor):
 
         return {'voxel_features': voxel_features,
                 'voxel_coords': voxel_coords,
-                'voxel_num_points': voxel_num_points}
+                'voxel_num_points': voxel_num_points,
+                }

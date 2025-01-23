@@ -24,6 +24,7 @@ from opencood.models.sub_modules.downsample_conv import DownsampleConv
 from opencood.models.sub_modules.mean_vfe import MeanVFE
 from opencood.models.sub_modules.sparse_backbone_3d import VoxelBackBone8x
 from opencood.models.sub_modules.height_compression import HeightCompression
+from opencood.models.sub_modules.point_transformer_v3 import PointTransformerV3
 from opencood.models.pixor import Bottleneck as PIXORBottlenect, BackBone as PIXORBackBone
 from opencood.models.backbones.resnet_ms import ResnetEncoder
 from opencood.models.sub_modules.fax_modules import FAXModule
@@ -31,7 +32,122 @@ from opencood.models.sub_modules.fax_modules import FAXModule
 from opencood.models.voxel_net import CML
 from opencood.utils.common_utils import torch_tensor_to_numpy
 from torch.autograd import Variable
+from torch_scatter import scatter_mean, scatter_max
 import math
+
+
+class PointTransformer(nn.Module):
+    def __init__(self, args):
+        super(PointTransformer, self).__init__()
+        self.transformer = PointTransformerV3(
+            stride=(2, ),
+            enc_depths=(1, 1),
+            enc_channels=(16, 32),
+            enc_num_head=(2, 4),
+            enc_patch_size=(128, 128),
+            dec_depths=(1,),
+            dec_channels=(64, ),
+            dec_num_head=(2, ),
+            dec_patch_size=(128, ),
+            mlp_ratio=8,
+            in_channels=1,
+            enable_flash=False, 
+            cls_mode=False)
+        
+    @staticmethod
+    def point_to_bev_mean(point):
+        # Extract information
+        batch_indices = point['batch'].long()  # Ensure correct data type
+        coords = point['coord'].long()
+        feats = point['feat']
+        
+        # Determine dimensions
+        batch_size = int(batch_indices.max().item()) + 1
+        num_channels = feats.shape[1]
+        lidar_range = point['lidar_range']
+        
+        H, W = point['grid_size'][1].item(), point['grid_size'][0].item()
+        
+        # Valid coordinate mask
+        valid_mask = (
+            (coords[:, 0] >= 0) & (coords[:, 0] < W) &
+            (coords[:, 1] >= 0) & (coords[:, 1] < H) &
+            (coords[:, 2] >= 0) & (coords[:, 2] < point['grid_size'][2].item()) &
+            (batch_indices >= 0) & (batch_indices < batch_size)
+        )
+        
+        # Apply mask
+        coords = coords[valid_mask]
+        feats = feats[valid_mask]
+        batch_indices = batch_indices[valid_mask]
+        
+        # Compute indices
+        x_indices = coords[:, 0]
+        y_indices = coords[:, 1]
+        batch_offset = batch_indices * H * W
+        linear_indices = batch_offset + y_indices * W + x_indices
+        
+        total_elements = batch_size * H * W
+        
+        # Check indices
+        assert linear_indices.min() >= 0 and linear_indices.max() < total_elements, (
+            f"Indices out of bounds: min {linear_indices.min()}, max {linear_indices.max()}, "
+            f"allowed range [0, {total_elements - 1}]"
+        )
+        
+        # Aggregate features
+        bev_feature_map = scatter_mean(feats, linear_indices, dim=0, dim_size=total_elements)
+        
+        # Reshape
+        bev_feature_map = bev_feature_map.view(batch_size, H, W, num_channels)
+        bev_feature_map = bev_feature_map.permute(0, 3, 1, 2)
+        
+        return bev_feature_map
+    
+    # def point_to_bev_max(point):
+    #     # Extract necessary information from the point dictionary
+    #     batch_indices = point['batch']  # Shape: [N]
+    #     coords = point['coord'].long()  # Shape: [N, 3], assuming integer grid indices
+    #     feats = point['feat']           # Shape: [N, C]
+    #     grid_size = point['grid_size']  # Tensor of shape [3], e.g., [256, 256, 1]
+        
+    #     # Determine the batch size and feature dimensions
+    #     batch_size = batch_indices.max().item() + 1
+    #     num_channels = feats.shape[1]
+    #     H, W = grid_size[1].item(), grid_size[0].item()  # Height and Width of the BEV map
+
+    #     # Compute linear indices for scatter operation
+    #     x_indices = coords[:, 0]
+    #     y_indices = coords[:, 1]
+    #     batch_offset = batch_indices * H * W
+    #     linear_indices = batch_offset + y_indices * W + x_indices  # Shape: [N]
+
+    #     # Total number of elements in the BEV feature map
+    #     total_elements = batch_size * H * W
+
+    #     # Aggregate features into the BEV feature map using max
+    #     # Note: scatter_max returns both the max values and the argmax indices
+    #     bev_feature_map, _ = scatter_max(feats, linear_indices, dim=0, dim_size=total_elements)
+
+    #     # Handle cells with no points (scatter_max fills with the minimum tensor value)
+    #     # Replace them with zeros or an appropriate value
+    #     bev_feature_map[bev_feature_map == feats.min()] = 0
+
+    #     # Reshape and permute to get the final BEV feature map of shape [batch_size, num_channels, H, W]
+    #     bev_feature_map = bev_feature_map.view(batch_size, H, W, num_channels)
+    #     bev_feature_map = bev_feature_map.permute(0, 3, 1, 2)  # Shape: [batch_size, num_channels, H, W]
+
+
+    def forward(self, data_dict, modality_name, multi_sensor=False):
+        point = self.transformer(data_dict[f'inputs_{modality_name}'])
+        # convert points to BEV feature map
+        # lidar_range = point['lidar_range']
+        # voxel_size = point['voxel_size']
+        # import pdb; pdb.set_trace()
+        
+        feature = self.point_to_bev_mean(point)
+        
+        return feature
 
 
 class FAX(nn.Module):

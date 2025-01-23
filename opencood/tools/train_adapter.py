@@ -6,8 +6,8 @@ import cv2
 import numpy as np
 import statistics
 
-from fvcore.nn import FlopCountAnalysis
-from fvcore.nn import flop_count_table
+# from fvcore.nn import FlopCountAnalysis
+# from fvcore.nn import flop_count_table
 
 import torch
 from torch import nn

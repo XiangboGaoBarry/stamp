@@ -290,6 +290,7 @@ class HomoCollab(nn.Module):
                 feature = feature_camera + feature_lidar
             else:
                 feature = eval(f"self.encoder_{modality_name}")(data_dict, modality_name, self.multi_sensor)
+                
             feature = eval(f"self.backbone_{modality_name}")({"spatial_features": feature})['spatial_features_2d']
             feature = eval(f"self.aligner_{modality_name}")(feature)
             
